@@ -64,7 +64,7 @@ To run this project locally:
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/YOUR_USERNAME/hell-clock-editor.git](https://github.com/YOUR_USERNAME/hell-clock-editor.git)
+    git clone https://github.com/Monddoc/Hellclock-Editor.git
     cd hell-clock-editor
     ```
 
