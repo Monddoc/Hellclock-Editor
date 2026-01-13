@@ -469,3 +469,23 @@ input[type="number"]:focus {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(156, 39, 176, 0.4);
 }
+
+/* CP Breakdown Styles */
+.cp-breakdown {
+    margin-top: 10px;
+    background: rgba(156, 39, 176, 0.1); /* Faint accent color */
+    border-left: 3px solid var(--accent);
+    padding: 10px;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+.cp-total-highlight {
+    color: var(--text-main);
+    font-weight: bold;
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.95rem;
+}

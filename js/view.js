@@ -17,6 +17,7 @@ export class View {
       // Stats Inputs
       soulstones: document.getElementById("soulstones"),
       cPoints: document.getElementById("c-points"),
+      cPointsInfo: document.getElementById("c-points-info"), // The info box
 
       // Campaign Status Indicators
       campaignDot: document.getElementById("campaign-dot"),
@@ -30,7 +31,7 @@ export class View {
       btnDownload: document.getElementById("btn-download"),
       btnCompleteAll: document.getElementById("btn-complete-all"),
 
-      // Modal
+      // Modal Elements
       modalOverlay: document.getElementById("welcome-modal"),
       btnCloseModal: document.getElementById("btn-close-modal"),
     };
@@ -48,8 +49,11 @@ export class View {
 
     // 1. Stats
     this.elements.soulstones.value = data.soulStones || 0;
-    this.elements.cPoints.value =
-      data.constellationsData?.constellationPoints || 0;
+
+    // Constellation Points Logic
+    const rawPoints = data.constellationsData?.constellationPoints || 0;
+    this.elements.cPoints.value = rawPoints;
+    this.updateConstellationInfo(rawPoints);
 
     // 2. Campaign Status
     const flags = data.flags || [];
@@ -67,6 +71,29 @@ export class View {
     // 3. Render Dynamic Sections
     this.renderMaterials(model);
     this.renderShrines(model);
+  }
+
+  // Securely render the breakdown without innerHTML
+  updateConstellationInfo(rawValue) {
+    const points = parseInt(rawValue) || 0;
+    const total = points + 10;
+
+    // Clear container
+    this.elements.cPointsInfo.textContent = "";
+
+    // 1. Highlight Element (Total)
+    const highlight = document.createElement("span");
+    highlight.className = "cp-total-highlight";
+    highlight.textContent = `In-Game Total: ${total}`;
+
+    // 2. Breakdown Element
+    // We use innerText with \n (newlines) which is safe and cleaner than <br> tags
+    const breakdown = document.createElement("span");
+    breakdown.innerText = `\n${points} from Save File\n6 from Unlocking Constellations\n4 from Campaign Completion`;
+
+    // Append to DOM
+    this.elements.cPointsInfo.appendChild(highlight);
+    this.elements.cPointsInfo.appendChild(breakdown);
   }
 
   renderMaterials(model) {
@@ -87,9 +114,8 @@ export class View {
       // Icon
       const icon = document.createElement("img");
       icon.className = "mat-icon";
-      icon.src = info.icon; // Loads path from model
-      icon.alt = info.name; // Accessibility
-
+      icon.src = info.icon;
+      icon.alt = info.name;
       icon.onerror = () => {
         icon.style.display = "none";
       };

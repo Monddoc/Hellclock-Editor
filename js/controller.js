@@ -12,16 +12,20 @@ class Controller {
     // --- 0. Modal Logic ---
 
     // Close on Button Click
-    this.view.elements.btnCloseModal.addEventListener("click", () => {
-      this.view.elements.modalOverlay.classList.add("hidden");
-    });
-
-    // Optional: Close if clicking outside the box
-    this.view.elements.modalOverlay.addEventListener("click", (e) => {
-      if (e.target === this.view.elements.modalOverlay) {
+    if (this.view.elements.btnCloseModal) {
+      this.view.elements.btnCloseModal.addEventListener("click", () => {
         this.view.elements.modalOverlay.classList.add("hidden");
-      }
-    });
+      });
+    }
+
+    // Close if clicking outside the box
+    if (this.view.elements.modalOverlay) {
+      this.view.elements.modalOverlay.addEventListener("click", (e) => {
+        if (e.target === this.view.elements.modalOverlay) {
+          this.view.elements.modalOverlay.classList.add("hidden");
+        }
+      });
+    }
 
     // --- 1. File Upload & Drag/Drop Logic ---
 
@@ -87,6 +91,7 @@ class Controller {
     });
 
     // --- 3. Input Gatekeeper (No Symbols) ---
+    // Blocks anything except digits 0-9 and navigation keys
     this.view.elements.editorUI.addEventListener("keydown", (e) => {
       if (e.target.tagName === "INPUT" && e.target.type === "number") {
         if (
@@ -112,6 +117,7 @@ class Controller {
         ) {
           return;
         }
+        // Allow only numbers
         if (!/^[0-9]$/.test(e.key)) {
           e.preventDefault();
         }
@@ -119,6 +125,7 @@ class Controller {
     });
 
     // --- 4. Paste Gatekeeper ---
+    // Prevents pasting text containing non-digits
     this.view.elements.editorUI.addEventListener("paste", (e) => {
       if (e.target.tagName === "INPUT" && e.target.type === "number") {
         const pasteData = (e.clipboardData || window.clipboardData).getData(
@@ -131,14 +138,24 @@ class Controller {
     });
 
     // --- 5. Data Changes ---
+
+    // Soulstones
     this.view.elements.soulstones.addEventListener("change", (e) => {
       this.model.updateSoulstones(e.target.value);
     });
 
-    this.view.elements.cPoints.addEventListener("change", (e) => {
-      this.model.updateConstellationPoints(e.target.value);
+    // Constellation Points (Real-time update)
+    this.view.elements.cPoints.addEventListener("input", (e) => {
+      const val = e.target.value;
+
+      // Update the Model with the RAW value (so saving works correctly)
+      this.model.updateConstellationPoints(val);
+
+      // Update the View's info box to show the "Total"
+      this.view.updateConstellationInfo(val);
     });
 
+    // Materials (Delegation)
     this.view.elements.materialsContainer.addEventListener("change", (e) => {
       if (e.target.dataset.type === "material") {
         const id = e.target.dataset.id;
@@ -146,6 +163,8 @@ class Controller {
         this.model.updateMaterial(id, val);
       }
     });
+
+    // --- 6. Buttons ---
 
     this.view.elements.btnCompleteAll.addEventListener("click", () => {
       const modified = this.model.completeAllShrines();
