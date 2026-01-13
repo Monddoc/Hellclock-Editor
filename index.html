@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hell Clock Editor</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <header>
+      <img
+        id="header-img"
+        src="icons/Header.png"
+        alt="Header"
+      />
+      <div class="header-title">Hell Clock Editor</div>
+    </header>
+
+    <div class="container">
+      <div class="upload-section" id="upload-zone">
+        <div style="font-size: 3rem; margin-bottom: 15px">📂</div>
+        <div style="font-size: 1.2rem; font-weight: bold; color: #fff">
+          Click or Drag Save File Here
+        </div>
+        <div style="color: #888; margin-top: 5px">
+          PlayerSave0.json corresponds to First Save Slot
+        </div>
+
+        <div class="path-container">
+          <p>Save File Location:</p>
+          <div class="path-box">
+            <code id="path-text"
+              >%USERPROFILE%\AppData\LocalLow\Rogue Snail\Hell Clock</code
+            >
+            <button id="btn-copy-path" class="btn-copy" title="Copy Path">
+              📋
+            </button>
+          </div>
+          <small>(Win+R and paste to open folder)</small>
+        </div>
+
+        <input id="file-upload" type="file" accept=".json" />
+        <p
+          id="filename-display"
+          style="margin-top: 15px; color: var(--accent); font-weight: bold"
+        ></p>
+      </div>
+
+      <div id="editor-ui">
+        <div class="main-grid">
+          <div class="column-left">
+            <div class="panel">
+              <div class="panel-header">
+                <h2>General Stats</h2>
+              </div>
+
+              <div class="stat-row">
+                <label>Soulstones</label>
+                <input type="number" id="soulstones" min="0" />
+              </div>
+
+              <div class="stat-row">
+                <label>Constellation Points</label>
+                <input type="number" id="c-points" min="0" />
+              </div>
+
+              <div class="campaign-box">
+                <div id="campaign-dot" class="status-dot"></div>
+                <div>
+                  <div
+                    style="
+                      font-size: 0.75rem;
+                      color: #888;
+                      text-transform: uppercase;
+                      letter-spacing: 1px;
+                    "
+                  >
+                    Campaign Status
+                  </div>
+                  <strong id="campaign-text" style="font-size: 0.95rem"
+                    >Unknown</strong
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="column-right">
+            <div class="panel">
+              <div class="panel-header">
+                <h2>Crafting Materials</h2>
+              </div>
+              <div id="materials-container" class="materials-grid"></div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <h2>Missing Cursed Shrines</h2>
+                <button id="btn-complete-all" class="btn-action">
+                  ✨ Complete All
+                </button>
+              </div>
+              <div id="shrines-container" class="shrine-grid"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="download-container">
+      <button id="btn-download" class="btn-download">
+        Download Modified Save
+      </button>
+    </div>
+
+    <script type="module" src="js/controller.js"></script>
+  </body>
+</html>
