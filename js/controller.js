@@ -3,22 +3,21 @@ import { View } from "./view.js";
 
 class Controller {
   constructor(model, view) {
+    // Initialize the controller with model and view instances
     this.model = model;
     this.view = view;
     this.initEventListeners();
   }
 
+  // Set up all event listeners for user interactions
   initEventListeners() {
-    // --- 0. Modal Logic ---
-
-    // Close on Button Click
+    // Modal Logic: Handle closing the welcome modal
     if (this.view.elements.btnCloseModal) {
       this.view.elements.btnCloseModal.addEventListener("click", () => {
         this.view.elements.modalOverlay.classList.add("hidden");
       });
     }
 
-    // Close if clicking outside the box
     if (this.view.elements.modalOverlay) {
       this.view.elements.modalOverlay.addEventListener("click", (e) => {
         if (e.target === this.view.elements.modalOverlay) {
@@ -27,13 +26,9 @@ class Controller {
       });
     }
 
-    // --- 1. File Upload & Drag/Drop Logic ---
-
+    // File Upload: Handle clicking on the upload zone and drag-and-drop
     const zone = this.view.elements.uploadZone;
-
-    // Click to upload
     zone.addEventListener("click", (e) => {
-      // Prevent triggering if clicking copy button
       if (e.target.closest("#btn-copy-path") || e.target.closest("#path-text"))
         return;
       this.view.elements.fileInput.click();
@@ -43,7 +38,6 @@ class Controller {
       this.handleFileUpload(e.target.files[0]);
     });
 
-    // Drag Enter / Over
     ["dragenter", "dragover"].forEach((eventName) => {
       zone.addEventListener(
         eventName,
@@ -56,7 +50,6 @@ class Controller {
       );
     });
 
-    // Drag Leave / Drop
     ["dragleave", "drop"].forEach((eventName) => {
       zone.addEventListener(
         eventName,
@@ -69,29 +62,25 @@ class Controller {
       );
     });
 
-    // Drop Action
     zone.addEventListener("drop", (e) => {
       const dt = e.dataTransfer;
       const files = dt.files;
-      if (files.length > 0) {
-        this.handleFileUpload(files[0]);
-      }
+      if (files.length > 0) this.handleFileUpload(files[0]);
     });
 
-    // --- 2. Copy Path Logic ---
+    // Copy Path: Handle copying the save file path to clipboard
     this.view.elements.btnCopy.addEventListener("click", (e) => {
-      e.stopPropagation(); // Stop it from opening file dialog
+      e.stopPropagation();
       const text = this.view.elements.pathText.innerText;
       navigator.clipboard.writeText(text).then(() => {
         const btn = this.view.elements.btnCopy;
         const originalText = btn.innerText;
-        btn.innerText = "✔"; // Visual feedback
+        btn.innerText = "✔";
         setTimeout(() => (btn.innerText = originalText), 1500);
       });
     });
 
-    // --- 3. Input Gatekeeper (No Symbols) ---
-    // Blocks anything except digits 0-9 and navigation keys
+    // Input Validation: Restrict input to numbers only for number fields
     this.view.elements.editorUI.addEventListener("keydown", (e) => {
       if (e.target.tagName === "INPUT" && e.target.type === "number") {
         if (
@@ -108,64 +97,54 @@ class Controller {
             "ArrowUp",
             "ArrowDown",
           ].includes(e.key)
-        ) {
+        )
           return;
-        }
         if (
           (e.ctrlKey || e.metaKey) &&
           ["a", "c", "v", "x"].includes(e.key.toLowerCase())
-        ) {
+        )
           return;
-        }
-        // Allow only numbers
-        if (!/^[0-9]$/.test(e.key)) {
-          e.preventDefault();
-        }
+        if (!/^[0-9]$/.test(e.key)) e.preventDefault();
       }
     });
 
-    // --- 4. Paste Gatekeeper ---
-    // Prevents pasting text containing non-digits
     this.view.elements.editorUI.addEventListener("paste", (e) => {
       if (e.target.tagName === "INPUT" && e.target.type === "number") {
         const pasteData = (e.clipboardData || window.clipboardData).getData(
           "text"
         );
-        if (/\D/.test(pasteData)) {
-          e.preventDefault();
-        }
+        if (/\D/.test(pasteData)) e.preventDefault();
       }
     });
 
-    // --- 5. Data Changes ---
+    // Data Changes: Handle updates to game data and re-render UI
+    const updateAndRender = (updateFn, val) => {
+      updateFn.call(this.model, val);
+      this.view.renderChangeLog(this.model);
+    };
 
-    // Soulstones
-    this.view.elements.soulstones.addEventListener("change", (e) => {
-      this.model.updateSoulstones(e.target.value);
+    // Soulstones input
+    this.view.elements.soulstones.addEventListener("input", (e) => {
+      updateAndRender(this.model.updateSoulstones, e.target.value);
     });
 
-    // Constellation Points (Real-time update)
+    // Constellation Points input
     this.view.elements.cPoints.addEventListener("input", (e) => {
       const val = e.target.value;
-
-      // Update the Model with the RAW value (so saving works correctly)
       this.model.updateConstellationPoints(val);
-
-      // Update the View's info box to show the "Total"
       this.view.updateConstellationInfo(val);
+      this.view.renderChangeLog(this.model);
     });
 
-    // Materials (Delegation)
-    this.view.elements.materialsContainer.addEventListener("change", (e) => {
+    // Materials input
+    this.view.elements.materialsContainer.addEventListener("input", (e) => {
       if (e.target.dataset.type === "material") {
-        const id = e.target.dataset.id;
-        const val = e.target.value;
-        this.model.updateMaterial(id, val);
+        this.model.updateMaterial(e.target.dataset.id, e.target.value);
+        this.view.renderChangeLog(this.model);
       }
     });
 
-    // --- 6. Buttons ---
-
+    // Buttons: Handle complete all shrines and download actions
     this.view.elements.btnCompleteAll.addEventListener("click", () => {
       const modified = this.model.completeAllShrines();
       if (modified) {
@@ -180,6 +159,7 @@ class Controller {
     });
   }
 
+  // Handle the file upload process, parse JSON, and update the view
   handleFileUpload(file) {
     if (!file) return;
     const reader = new FileReader();
@@ -195,6 +175,7 @@ class Controller {
     reader.readAsText(file);
   }
 
+  // Handle downloading the modified save file
   handleDownload() {
     const url = this.model.getDownloadLink();
     if (!url) return;

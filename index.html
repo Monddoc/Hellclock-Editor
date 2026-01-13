@@ -58,27 +58,44 @@
               <div class="stat-row">
                 <label>Constellation Points</label>
                 <input type="number" id="c-points" min="0" />
-
                 <div id="c-points-info" class="cp-breakdown"></div>
               </div>
 
-              <div class="campaign-box">
-                <div id="campaign-dot" class="status-dot"></div>
-                <div>
-                  <div
-                    style="
-                      font-size: 0.75rem;
-                      color: #888;
-                      text-transform: uppercase;
-                      letter-spacing: 1px;
-                    "
-                  >
-                    Campaign Status
+              <div class="info-grid">
+                <div class="info-box campaign-box">
+                  <div id="campaign-dot" class="status-dot"></div>
+                  <div>
+                    <div class="info-label">Campaign Status</div>
+                    <strong id="campaign-text" class="info-value"
+                      >Unknown</strong
+                    >
                   </div>
-                  <strong id="campaign-text" style="font-size: 0.95rem"
-                    >Unknown</strong
-                  >
                 </div>
+                <div class="info-box">
+                  <div class="info-icon">🏃</div>
+                  <div>
+                    <div class="info-label">Total Runs</div>
+                    <strong id="total-runs" class="info-value">0</strong>
+                  </div>
+                </div>
+                <div class="info-box">
+                  <div class="info-icon">💀</div>
+                  <div>
+                    <div class="info-label">Total Deaths</div>
+                    <strong id="total-deaths" class="info-value">0</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel" id="summary-panel" style="display: none">
+              <div class="panel-header">
+                <h2>📝 Change Summary</h2>
+              </div>
+              <div id="change-log" class="change-log-box">
+                <p style="color: #666; font-style: italic">
+                  No changes made yet.
+                </p>
               </div>
             </div>
           </div>
@@ -114,7 +131,6 @@
     <div id="welcome-modal" class="modal-overlay">
       <div class="modal-content">
         <h2>🚀 How to Use</h2>
-
         <ul class="instruction-list">
           <li class="warning">
             <strong>⚠️ Backup your save file!</strong><br />
@@ -132,8 +148,7 @@
           <li>Paste that path into your File Explorer address bar</li>
           <li>
             Drag and drop
-            <strong>PlayerSave0.json (or another save file)</strong> into the
-            editor
+            <strong>PlayerSave0.json</strong> into the editor
           </li>
           <li>Modify your resources or complete your cursed shrines</li>
           <li>Click <strong>"Download Modified Save"</strong></li>
@@ -141,10 +156,10 @@
             Replace the original file in the folder with the downloaded one
           </li>
         </ul>
-
         <button id="btn-close-modal" class="btn-primary">Let's Go!</button>
       </div>
     </div>
+
     <script type="module" src="js/controller.js"></script>
   </body>
 </html>

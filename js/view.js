@@ -1,61 +1,67 @@
 export class View {
   constructor() {
+    // Initialize the view by caching DOM element references
     this.elements = {
-      // Upload Section
       uploadZone: document.getElementById("upload-zone"),
       fileInput: document.getElementById("file-upload"),
       fileNameDisplay: document.getElementById("filename-display"),
-
-      // Path Hint Elements
       pathText: document.getElementById("path-text"),
       btnCopy: document.getElementById("btn-copy-path"),
-
-      // Main Editor UI
       editorUI: document.getElementById("editor-ui"),
       downloadContainer: document.getElementById("download-container"),
 
-      // Stats Inputs
+      // Editable Stats
       soulstones: document.getElementById("soulstones"),
       cPoints: document.getElementById("c-points"),
-      cPointsInfo: document.getElementById("c-points-info"), // The info box
+      cPointsInfo: document.getElementById("c-points-info"),
 
-      // Campaign Status Indicators
+      // Read-Only Info Boxes
+      totalDeaths: document.getElementById("total-deaths"),
+      totalRuns: document.getElementById("total-runs"),
+
+      // Summary
+      summaryPanel: document.getElementById("summary-panel"),
+      changeLog: document.getElementById("change-log"),
+
       campaignDot: document.getElementById("campaign-dot"),
       campaignText: document.getElementById("campaign-text"),
-
-      // Containers
       materialsContainer: document.getElementById("materials-container"),
       shrinesContainer: document.getElementById("shrines-container"),
-
-      // Buttons
       btnDownload: document.getElementById("btn-download"),
       btnCompleteAll: document.getElementById("btn-complete-all"),
-
-      // Modal Elements
       modalOverlay: document.getElementById("welcome-modal"),
       btnCloseModal: document.getElementById("btn-close-modal"),
     };
   }
 
+  // Display the editor interface after a file is uploaded
   showEditor(fileName) {
     this.elements.fileNameDisplay.textContent = fileName;
     this.elements.editorUI.style.display = "block";
+    this.elements.summaryPanel.style.display = "block";
     this.elements.downloadContainer.classList.add("visible");
   }
 
+  // Render all UI components with data from the model
   render(model) {
     const data = model.getData();
     if (!data) return;
 
-    // 1. Stats
+    // Update editable stats
     this.elements.soulstones.value = data.soulStones || 0;
 
-    // Constellation Points Logic
     const rawPoints = data.constellationsData?.constellationPoints || 0;
     this.elements.cPoints.value = rawPoints;
     this.updateConstellationInfo(rawPoints);
 
-    // 2. Campaign Status
+    // Update read-only stats
+    const stats = model.getCalculatedStats();
+
+    // Format Numbers (e.g., 1,000)
+    this.elements.totalDeaths.textContent = stats.deaths.toLocaleString();
+    this.elements.totalRuns.textContent = stats.runs.toLocaleString();
+
+    // Update campaign status
     const flags = data.flags || [];
     const isCampaignDone = flags.includes("SawEndgameWelcome");
     this.elements.campaignDot.className = isCampaignDone
@@ -68,38 +74,78 @@ export class View {
       ? "var(--success)"
       : "var(--danger)";
 
-    // 3. Render Dynamic Sections
+    // Render dynamic sections
     this.renderMaterials(model);
     this.renderShrines(model);
+    this.renderChangeLog(model);
   }
 
-  // Securely render the breakdown without innerHTML
+  // Update the constellation points breakdown display
   updateConstellationInfo(rawValue) {
     const points = parseInt(rawValue) || 0;
     const total = points + 10;
-
-    // Clear container
     this.elements.cPointsInfo.textContent = "";
 
-    // 1. Highlight Element (Total)
     const highlight = document.createElement("span");
     highlight.className = "cp-total-highlight";
     highlight.textContent = `In-Game Total: ${total}`;
 
-    // 2. Breakdown Element
-    // We use innerText with \n (newlines) which is safe and cleaner than <br> tags
     const breakdown = document.createElement("span");
     breakdown.innerText = `\n${points} from Save File\n6 from Unlocking Constellations\n4 from Campaign Completion`;
 
-    // Append to DOM
     this.elements.cPointsInfo.appendChild(highlight);
     this.elements.cPointsInfo.appendChild(breakdown);
   }
 
+  // Render the change log showing modifications made
+  renderChangeLog(model) {
+    const changes = model.getChanges();
+    const container = this.elements.changeLog;
+    container.innerHTML = "";
+
+    if (changes.length === 0) {
+      const p = document.createElement("p");
+      p.style.color = "#666";
+      p.style.fontStyle = "italic";
+      p.textContent = "No changes made yet.";
+      container.appendChild(p);
+      return;
+    }
+
+    changes.forEach((change) => {
+      const row = document.createElement("div");
+      row.className = "log-item";
+
+      const label = document.createElement("span");
+      label.className = "log-label";
+      label.textContent = change.label;
+
+      const diff = document.createElement("span");
+      diff.className = "log-diff";
+
+      const oldVal = document.createElement("span");
+      oldVal.textContent = change.from;
+
+      const arrow = document.createElement("span");
+      arrow.textContent = " ➜ ";
+
+      const newVal = document.createElement("strong");
+      newVal.textContent = change.to;
+
+      diff.appendChild(oldVal);
+      diff.appendChild(arrow);
+      diff.appendChild(newVal);
+
+      row.appendChild(label);
+      row.appendChild(diff);
+      container.appendChild(row);
+    });
+  }
+
+  // Render the crafting materials section
   renderMaterials(model) {
     const container = this.elements.materialsContainer;
-    container.innerHTML = ""; // Clear previous content
-
+    container.innerHTML = "";
     const data = model.getData();
     const currencyData = data.currencySaveData?._persistentData || [];
 
@@ -107,11 +153,9 @@ export class View {
       const item = currencyData.find((c) => c._currencyID == id);
       const amount = item ? item._amount : 0;
 
-      // Create Card
       const card = document.createElement("div");
       card.className = "mat-item";
 
-      // Icon
       const icon = document.createElement("img");
       icon.className = "mat-icon";
       icon.src = info.icon;
@@ -120,14 +164,11 @@ export class View {
         icon.style.display = "none";
       };
 
-      // Details
       const details = document.createElement("div");
       details.className = "mat-details";
-
       const name = document.createElement("span");
       name.className = "mat-name";
       name.textContent = info.name;
-
       const idSpan = document.createElement("span");
       idSpan.className = "mat-id";
       idSpan.textContent = `ID: ${id}`;
@@ -135,29 +176,24 @@ export class View {
       details.appendChild(name);
       details.appendChild(idSpan);
 
-      // Input Wrapper
       const inputWrapper = document.createElement("div");
       inputWrapper.className = "mat-input-wrapper";
-
       const input = document.createElement("input");
       input.type = "number";
       input.min = "0";
       input.value = amount;
-      // Dataset attributes for Event Delegation
       input.dataset.type = "material";
       input.dataset.id = id;
 
       inputWrapper.appendChild(input);
-
-      // Assemble
       card.appendChild(icon);
       card.appendChild(details);
       card.appendChild(inputWrapper);
-
       container.appendChild(card);
     }
   }
 
+  // Render the cursed shrines section
   renderShrines(model) {
     const container = this.elements.shrinesContainer;
     container.innerHTML = "";
@@ -171,8 +207,6 @@ export class View {
       const spawned = shrineData.shrineLevelIndexes || [];
       const claimed = shrineData.claimedShrineLevelIndexes || [];
       const claimedSet = new Set(claimed);
-
-      // Calculate missing shrines and sort them
       const missing = spawned
         .filter((x) => !claimedSet.has(x))
         .sort((a, b) => a - b);
@@ -186,17 +220,13 @@ export class View {
       const card = document.createElement("div");
       card.className = `shrine-card ${isComplete ? "complete" : "missing"}`;
 
-      // Header
       const header = document.createElement("div");
       header.className = "dungeon-header";
-
       const nameSpan = document.createElement("span");
       nameSpan.textContent = name;
       header.appendChild(nameSpan);
-
       card.appendChild(header);
 
-      // Content Body
       if (isComplete) {
         const msg = document.createElement("div");
         msg.className = "complete-msg";
@@ -205,26 +235,20 @@ export class View {
       } else {
         const tagsDiv = document.createElement("div");
         tagsDiv.className = "missing-tags";
-
         missing.forEach((index) => {
           const tag = document.createElement("span");
           tag.className = "floor-tag";
-          // Convert Index to Floor Number
           tag.textContent = `Floor ${index + 1}`;
           tagsDiv.appendChild(tag);
         });
-
         card.appendChild(tagsDiv);
       }
-
       container.appendChild(card);
     });
 
-    // Empty State
     if (!hasContent) {
       const p = document.createElement("p");
       p.style.color = "#666";
-      p.style.padding = "10px";
       p.textContent = "No shrine data found.";
       container.appendChild(p);
     }
