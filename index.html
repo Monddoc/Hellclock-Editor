@@ -8,11 +8,7 @@
   </head>
   <body>
     <header>
-      <img
-        id="header-img"
-        src="icons/Header.png"
-        alt="Header"
-      />
+      <img id="header-img" src="icons/Header.png" alt="Header" />
       <div class="header-title">Hell Clock Editor</div>
     </header>
 
@@ -113,6 +109,36 @@
       </button>
     </div>
 
+    <div id="welcome-modal" class="modal-overlay">
+      <div class="modal-content">
+        <h2>🚀 How to Use</h2>
+
+        <ul class="instruction-list">
+          <li class="warning">
+            <strong>⚠️ Backup your save file!</strong> Always make a copy of
+            your <code>.json</code> file before editing
+          </li>
+          <li>
+            Click the <strong>Copy Path</strong> button (in the upload box) to
+            get the save location:
+            <div class="code-snippet">
+              %USERPROFILE%\AppData\LocalLow\Rogue Snail\Hell Clock
+            </div>
+          </li>
+          <li>Paste that path into your File Explorer address bar</li>
+          <li>
+            Drag and drop <strong>PlayerSave0.json (or another save file)</strong> into the editor
+          </li>
+          <li>Modify your resources or complete your cursed shrines</li>
+          <li>Click <strong>"Download Modified Save"</strong></li>
+          <li>
+            Replace the original file in the folder with the downloaded one
+          </li>
+        </ul>
+
+        <button id="btn-close-modal" class="btn-primary">Let's Go!</button>
+      </div>
+    </div>
     <script type="module" src="js/controller.js"></script>
   </body>
 </html>

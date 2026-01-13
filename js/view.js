@@ -29,6 +29,10 @@ export class View {
       // Buttons
       btnDownload: document.getElementById("btn-download"),
       btnCompleteAll: document.getElementById("btn-complete-all"),
+
+      // Modal
+      modalOverlay: document.getElementById("welcome-modal"),
+      btnCloseModal: document.getElementById("btn-close-modal"),
     };
   }
 
