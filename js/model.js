@@ -96,10 +96,11 @@ export class Model {
     }
   }
 
-  // Mark all unclaimed cursed shrines as completed
+  // Mark all unclaimed cursed shrines as completed, Counts added shrines and updates Constellation Points automatically
   completeAllShrines() {
     if (!this.data?.dungeonData) return false;
-    let modified = false;
+
+    let addedPoints = 0; // Counter for new shrines
 
     this.data.dungeonData.forEach((dungeon) => {
       const data = dungeon.cursedShrineSpawnData;
@@ -114,11 +115,23 @@ export class Model {
       spawned.forEach((index) => {
         if (!claimedSet.has(index)) {
           claimed.push(index);
-          modified = true;
+          addedPoints++; // Increment for every new shrine found
         }
       });
     });
-    return modified;
+
+    // If we added any shrines, update the total constellation points
+    if (addedPoints > 0) {
+      if (this.data.constellationsData) {
+        const currentPoints =
+          this.data.constellationsData.constellationPoints || 0;
+        this.data.constellationsData.constellationPoints =
+          currentPoints + addedPoints;
+      }
+      return true;
+    }
+
+    return false;
   }
 
   // Methods for generating change logs
