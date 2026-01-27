@@ -9,6 +9,7 @@
   --success: #00e676;
   --success-dark: #00c853;
   --danger: #ff5252;
+  --warning: #ff9102;
   --border: #33333a;
   --input-bg: #121215;
 }
@@ -492,6 +493,28 @@ input[type="number"]:focus {
   margin-left: -20px;
   text-align: center;
 }
+.instruction-list li.orangeWarning {
+  color: var(--warning);
+  background: rgba(255, 136, 0, 0.1);
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid var(--warning);
+  list-style: none;
+  margin-left: -20px;
+  text-align: center;
+}
+
+.disclaimer li.orangeWarning {
+  color: var(--warning);
+  background: rgba(255, 136, 0, 0.1);
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid var(--warning);
+  list-style: none;
+  margin-left: -39px;
+  text-align: center;
+
+}
 
 .code-snippet {
   background: rgba(0, 0, 0, 0.3);
@@ -677,7 +700,9 @@ input[type="number"]:focus {
   align-items: center;
   gap: 15px;
   border: 1px solid var(--border);
-  transition: transform 0.2s, background-color 0.2s;
+  transition:
+    transform 0.2s,
+    background-color 0.2s;
 }
 
 .mode-box:hover {
@@ -694,77 +719,78 @@ input[type="number"]:focus {
   letter-spacing: 0.5px;
 }
 
-
 /* --- Tooltip Styles --- */
 .tooltip-container {
-    position: relative;
-    cursor: help;
+  position: relative;
+  cursor: help;
 }
 
 .tooltip-icon {
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    width: 22px;
-    height: 22px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    font-size: 12px;
-    font-weight: bold;
-    color: var(--text-muted);
-    transition: all 0.2s ease;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 22px;
+  height: 22px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--text-muted);
+  transition: all 0.2s ease;
 }
 
 .tooltip-container:hover .tooltip-icon {
-    background: var(--accent);
-    color: white;
-    border-color: var(--accent);
-    transform: scale(1.2);
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  transform: scale(1.2);
 }
 
 .tooltip-text {
-    visibility: hidden;
-    opacity: 0;
-    width: 220px;
-    background-color: var(--bg-element);
-    color: var(--text-main);
-    text-align: center;
-    border-radius: 6px;
-    padding: 10px;
-    position: absolute;
-    z-index: 100;
-    
-    /* Position above the icon */
-    bottom: 135%; 
-    left: 50%;
-    margin-left: -110px;
-    
-    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-    border: 1px solid var(--border);
-    font-size: 0.8rem;
-    font-weight: normal;
-    line-height: 1.4;
-    transition: opacity 0.3s, transform 0.3s;
-    transform: translateY(10px);
-    pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  width: 220px;
+  background-color: var(--bg-element);
+  color: var(--text-main);
+  text-align: center;
+  border-radius: 6px;
+  padding: 10px;
+  position: absolute;
+  z-index: 100;
+
+  /* Position above the icon */
+  bottom: 135%;
+  left: 50%;
+  margin-left: -110px;
+
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border);
+  font-size: 0.8rem;
+  font-weight: normal;
+  line-height: 1.4;
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
+  transform: translateY(10px);
+  pointer-events: none;
 }
 
 /* Tiny arrow at the bottom of the tooltip */
 .tooltip-text::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: var(--bg-element) transparent transparent transparent;
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: var(--bg-element) transparent transparent transparent;
 }
 
 /* Show on Hover */
 .tooltip-container:hover .tooltip-text {
-    visibility: visible;
-    opacity: 1;
-    transform: translateY(0);
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
 }
