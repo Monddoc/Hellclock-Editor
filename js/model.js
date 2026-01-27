@@ -45,6 +45,8 @@ export class Model {
   loadData(jsonString, fileName) {
     try {
       this.data = JSON.parse(jsonString);
+      //Clean up duplicates immediately after parsing
+      this._cleanCurrencyData(this.data);
       this.originalData = structuredClone(this.data);
       this.fileName = fileName;
       return true;
@@ -52,6 +54,43 @@ export class Model {
       console.error(e);
       return false;
     }
+  }
+
+  // This merges split stacks (e.g., 999 + 0) into a single entry
+  _cleanCurrencyData(dataObj) {
+    // Ensure we are only looking at the currency array
+    if (
+      !dataObj ||
+      !dataObj.currencySaveData ||
+      !Array.isArray(dataObj.currencySaveData._persistentData)
+    ) {
+      return;
+    }
+
+    const rawList = dataObj.currencySaveData._persistentData;
+    const mergedMap = new Map();
+
+    rawList.forEach((item) => {
+      // Only process items that actually have a valid ID
+      if (item._currencyID === undefined || item._currencyID === null) return;
+
+      const id = item._currencyID;
+
+      if (mergedMap.has(id)) {
+        const existing = mergedMap.get(id);
+        // Merge the amounts
+        existing._amount = (existing._amount || 0) + (item._amount || 0);
+        // Merge fragments if the game uses them, just to be clean
+        existing._fragmentAmount =
+          (existing._fragmentAmount || 0) + (item._fragmentAmount || 0);
+      } else {
+        // Clone the item to avoid reference issues
+        mergedMap.set(id, { ...item });
+      }
+    });
+
+    // Replace the dirty list with the clean list
+    dataObj.currencySaveData._persistentData = Array.from(mergedMap.values());
   }
 
   // Get the display name for a dungeon based on its ID
@@ -71,7 +110,7 @@ export class Model {
     if (this.data?.constellationsData) {
       this.data.constellationsData.constellationPoints = Math.max(
         0,
-        parseInt(value) || 0
+        parseInt(value) || 0,
       );
     }
   }
@@ -81,7 +120,7 @@ export class Model {
     if (this.data?.greatBellSkillTreeData) {
       this.data.greatBellSkillTreeData._memoryLevel = Math.max(
         0,
-        parseInt(value) || 0
+        parseInt(value) || 0,
       );
     }
   }
@@ -91,7 +130,7 @@ export class Model {
     if (this.data?.penancesSkillTreeData) {
       this.data.penancesSkillTreeData._highestHellLevelReached = Math.max(
         0,
-        parseInt(value) || 0
+        parseInt(value) || 0,
       );
     }
   }
@@ -190,7 +229,8 @@ export class Model {
     // Hell Level
     const oldHell =
       this.originalData.penancesSkillTreeData?._highestHellLevelReached || 0;
-    const newHell = this.data.penancesSkillTreeData?._highestHellLevelReached || 0;
+    const newHell =
+      this.data.penancesSkillTreeData?._highestHellLevelReached || 0;
     if (oldHell !== newHell) {
       changes.push({ label: "Hell Level", from: oldHell, to: newHell });
     }
@@ -212,7 +252,7 @@ export class Model {
     // Cursed Shrines
     this.data.dungeonData.forEach((d, i) => {
       const origD = this.originalData.dungeonData.find(
-        (od) => od.dungeonID === d.dungeonID
+        (od) => od.dungeonID === d.dungeonID,
       );
       if (!origD) return;
 
