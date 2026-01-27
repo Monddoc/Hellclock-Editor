@@ -94,4 +94,4 @@ To run this project locally:
 
 ## 📜 Disclaimer
 
-This tool is not affiliated with **Rogue Snail** or **Astral Ascent**. It is a community-made tool. Use at your own risk.
+This tool is not affiliated with **Rogue Snail** or **Hell Clock**. It is a community-made tool. Use at your own risk.
