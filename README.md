@@ -3,7 +3,6 @@
 > A save file editor for **Hell Clock**.
 
 ![Version](https://img.shields.io/badge/version-1.0.0-purple)
-![License](https://img.shields.io/badge/license-MIT-green)
 ![Platform](https://img.shields.io/badge/platform-Web-blue)
 
 The **Hell Clock Editor** is a client-side web tool designed to help players manage their *Hell Clock* save files (`PlayerSave0.json`). Built with a focus on user experience (UX) and data integrity, it allows for easy modification of currencies, materials, and shrine unlocks without the risk of file corruption.
@@ -95,4 +94,4 @@ To run this project locally:
 
 ## 📜 Disclaimer
 
-This tool is not affiliated with **Rogue Snail** or **Astral Ascent**. It is a community-made tool. Use at your own risk.
+This tool is not affiliated with **Rogue Snail** or **Hell Clock**. It is a community-made tool. Use at your own risk.
