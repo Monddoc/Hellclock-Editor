@@ -88,7 +88,8 @@ export class View {
 
     // 2. Campaign & Game Modes
     const flags = data.flags || [];
-    const isCampaignDone = flags.includes("SawEndgameWelcome");
+    // DLC saves use variants like "SawEndgameWelcome CursedWar"
+    const isCampaignDone = flags.some((f) => f.startsWith("SawEndgameWelcome"));
     this.elements.campaignDot.className = isCampaignDone
       ? "status-dot active"
       : "status-dot inactive";

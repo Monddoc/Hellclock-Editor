@@ -39,6 +39,12 @@ export class Model {
       15: "Act 2 (Oblivion)",
       16: "Act 3 (Oblivion)",
     };
+    // Endless Nightmares dungeons: their shrines only refill missing shrine points
+    this.nightmareDungeonIds = new Set([23, 27, 28, 29, 30, 31, 32, 33]);
+  }
+
+  isNightmareDungeon(id) {
+    return this.nightmareDungeonIds.has(id);
   }
 
   // Load and parse JSON data from the save file
@@ -95,7 +101,9 @@ export class Model {
 
   // Get the display name for a dungeon based on its ID
   getDungeonName(id) {
-    return this.dungeonNames[id] || `Dungeon ${id}`;
+    if (this.dungeonNames[id]) return this.dungeonNames[id];
+    if (this.isNightmareDungeon(id)) return `Endless Nightmares (${id})`;
+    return `Dungeon ${id}`;
   }
 
   // Methods for updating game data
@@ -159,13 +167,17 @@ export class Model {
   completeAllShrines() {
     if (!this.data?.dungeonData) return false;
 
-    let addedPoints = 0; // Counter for new shrines
+    let campaignAdded = 0; // New shrines in campaign dungeons
+    let nightmareAdded = 0; // New shrines in Endless Nightmares dungeons
+    let shrineCap = 0; // Max points shrines can give = total campaign shrines
 
     this.data.dungeonData.forEach((dungeon) => {
       const data = dungeon.cursedShrineSpawnData;
       if (!data) return;
 
+      const isNightmare = this.isNightmareDungeon(dungeon.dungeonID);
       const spawned = data.shrineLevelIndexes || [];
+      if (!isNightmare) shrineCap += spawned.length;
       if (!data.claimedShrineLevelIndexes) data.claimedShrineLevelIndexes = [];
 
       const claimed = data.claimedShrineLevelIndexes;
@@ -174,23 +186,23 @@ export class Model {
       spawned.forEach((index) => {
         if (!claimedSet.has(index)) {
           claimed.push(index);
-          addedPoints++; // Increment for every new shrine found
+          if (isNightmare) nightmareAdded++;
+          else campaignAdded++;
         }
       });
     });
 
-    // If we added any shrines, update the total constellation points
-    if (addedPoints > 0) {
-      if (this.data.constellationsData) {
-        const currentPoints =
-          this.data.constellationsData.constellationPoints || 0;
-        this.data.constellationsData.constellationPoints =
-          currentPoints + addedPoints;
-      }
-      return true;
-    }
+    if (campaignAdded + nightmareAdded === 0) return false;
 
-    return false;
+    // Campaign shrines always add a point; Nightmare shrines only fill up to the cap
+    if (this.data.constellationsData) {
+      const afterCampaign =
+        (this.data.constellationsData.constellationPoints || 0) + campaignAdded;
+      const missing = Math.max(0, shrineCap - afterCampaign);
+      this.data.constellationsData.constellationPoints =
+        afterCampaign + Math.min(nightmareAdded, missing);
+    }
+    return true;
   }
 
   // Methods for generating change logs
