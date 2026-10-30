@@ -132,7 +132,7 @@ class Controller {
     this.view.elements.cPoints.addEventListener("input", (e) => {
       const val = e.target.value;
       this.model.updateConstellationPoints(val);
-      this.view.updateConstellationInfo(val);
+      this.view.updateConstellationInfo(val, this.model.getShrinePointCap());
       this.view.renderChangeLog(this.model);
     });
 

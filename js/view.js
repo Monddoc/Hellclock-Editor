@@ -79,7 +79,7 @@ export class View {
 
     const rawPoints = data.constellationsData?.constellationPoints || 0;
     this.elements.cPoints.value = rawPoints;
-    this.updateConstellationInfo(rawPoints);
+    this.updateConstellationInfo(rawPoints, model.getShrinePointCap());
 
     // Read-Only Stats
     const stats = model.getCalculatedStats();
@@ -134,17 +134,18 @@ export class View {
   }
 
   // Update the constellation points breakdown display
-  updateConstellationInfo(rawValue) {
+  updateConstellationInfo(rawValue, shrineCap) {
     const points = parseInt(rawValue) || 0;
     const total = points + 10;
+    const max = shrineCap + 10;
     this.elements.cPointsInfo.textContent = "";
 
     const highlight = document.createElement("span");
     highlight.className = "cp-total-highlight";
-    highlight.textContent = `In-Game Total: ${total}`;
+    highlight.textContent = `In-Game Total: ${total} / ${max} max`;
 
     const breakdown = document.createElement("span");
-    breakdown.innerText = `\n${points} from Save File\n6 from Unlocking Constellations\n4 from Campaign Completion`;
+    breakdown.innerText = `\n${points} from Save File (max ${shrineCap}, 1 per Cursed Shrine)\n6 from Unlocking Constellations\n4 from Campaign Completion`;
 
     this.elements.cPointsInfo.appendChild(highlight);
     this.elements.cPointsInfo.appendChild(breakdown);
@@ -253,6 +254,13 @@ export class View {
     const data = model.getData();
     const dungeons = data.dungeonData || [];
     let hasContent = false;
+
+    const note = document.createElement("p");
+    note.className = "shrine-note";
+    note.textContent =
+      "Some campaign Cursed Shrines may still show as missing even though you already have their points. " +
+      "Endless Nightmares shrines fill in points from missing campaign shrines, up to the max.";
+    container.appendChild(note);
 
     dungeons.forEach((dungeon) => {
       const id = dungeon.dungeonID;

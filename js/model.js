@@ -47,6 +47,14 @@ export class Model {
     return this.nightmareDungeonIds.has(id);
   }
 
+  // Max points shrines can give = total spawned shrines in campaign dungeons
+  getShrinePointCap() {
+    return (this.data?.dungeonData || []).reduce((sum, dungeon) => {
+      if (this.isNightmareDungeon(dungeon.dungeonID)) return sum;
+      return sum + (dungeon.cursedShrineSpawnData?.shrineLevelIndexes?.length || 0);
+    }, 0);
+  }
+
   // Load and parse JSON data from the save file
   loadData(jsonString, fileName) {
     try {
@@ -169,7 +177,7 @@ export class Model {
 
     let campaignAdded = 0; // New shrines in campaign dungeons
     let nightmareAdded = 0; // New shrines in Endless Nightmares dungeons
-    let shrineCap = 0; // Max points shrines can give = total campaign shrines
+    const shrineCap = this.getShrinePointCap();
 
     this.data.dungeonData.forEach((dungeon) => {
       const data = dungeon.cursedShrineSpawnData;
@@ -177,7 +185,6 @@ export class Model {
 
       const isNightmare = this.isNightmareDungeon(dungeon.dungeonID);
       const spawned = data.shrineLevelIndexes || [];
-      if (!isNightmare) shrineCap += spawned.length;
       if (!data.claimedShrineLevelIndexes) data.claimedShrineLevelIndexes = [];
 
       const claimed = data.claimedShrineLevelIndexes;

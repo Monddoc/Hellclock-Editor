@@ -297,6 +297,18 @@ input[type="number"]:focus {
   border-radius: 4px;
 }
 
+.shrine-note {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--warning);
+  background: rgba(255, 136, 0, 0.1);
+  border: 1px solid var(--warning);
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
 .complete-msg {
   color: var(--success);
   font-weight: bold;
